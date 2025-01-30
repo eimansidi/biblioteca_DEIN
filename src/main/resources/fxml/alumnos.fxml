@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../styles/style.css" fx:controller="com.eiman.biblioteca.controllers.AlumnoController">
-    <VBox alignment="CENTER" spacing="15" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20">
+<AnchorPane stylesheets="@../styles/style.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.eiman.biblioteca.controllers.AlumnoController">
+    <VBox alignment="CENTER" spacing="15" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
 
-        <Label text="%alumnos"/>
+        <Label text="%alumnos" />
 
-        <TextField fx:id="txtDni" promptText="%dni"/>
-        <TextField fx:id="txtNombre" promptText="%nombre"/>
-        <TextField fx:id="txtApellido1" promptText="%apellido1"/>
-        <TextField fx:id="txtApellido2" promptText="%apellido2"/>
+        <TextField fx:id="txtDni" promptText="%dni" />
+        <TextField fx:id="txtNombre" promptText="%nombre" />
+        <TextField fx:id="txtApellido1" promptText="%apellido1" />
+        <TextField fx:id="txtApellido2" promptText="%apellido2" />
 
         <HBox alignment="CENTER" spacing="10">
-            <Button fx:id="btnGuardar" onAction="#guardarAlumno" text="%guardar"/>
-            <Button fx:id="btnCancelar" onAction="#cancelar" text="%cancelar"/>
+            <Button fx:id="btnGuardar" onAction="#guardarAlumno" text="%guardar" />
+            <Button fx:id="btnCancelar" onAction="#cancelar" text="%cancelar" />
         </HBox>
     </VBox>
+   <padding>
+      <Insets bottom="20.0" />
+   </padding>
 </AnchorPane>
