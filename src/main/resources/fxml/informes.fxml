@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.Pos?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.eiman.biblioteca.controllers.InformesController">
-    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="10">
-        <Button text="Informe Alumnos" fx:id="btnInformeAlumnos" onAction="#generarInformeAlumnos"/>
-        <Button text="Informe Libros" fx:id="btnInformeLibros" onAction="#generarInformeLibros"/>
-        <Button text="Informe Prestamos" fx:id="btnInformePrestamos" onAction="#generarInformePrestamos"/>
-        <Button text="Informe Histórico Préstamos" fx:id="btnInformeHistorico" onAction="#generarInformeHistorico"/>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../styles/style.css" fx:controller="com.eiman.biblioteca.controllers.InformesController">
+    <VBox alignment="CENTER" spacing="15" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20">
+
+        <Label text="%informes"/>
+
+        <Button fx:id="btnInformeAlumnos" onAction="#generarInformeAlumnos" text="%button.informeAlumnos"/>
+        <Button fx:id="btnInformeLibros" onAction="#generarInformeLibros" text="%button.informeLibros"/>
+        <Button fx:id="btnInformePrestamos" onAction="#generarInformePrestamos" text="%button.informePrestamos"/>
+        <Button fx:id="btnInformeHistorico" onAction="#generarInformeHistorico" text="%button.informeHistorico"/>
+
     </VBox>
 </AnchorPane>

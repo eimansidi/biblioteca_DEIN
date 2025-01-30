@@ -7,11 +7,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase DAO que gestiona la conexion y operaciones CRUD para la tabla Historico_prestamo.
+ * Permite insertar, obtener, actualizar y modificar registros del historial de prestamos.
+ */
 public class HistoricoPrestamoDAO {
 
     private static final String TABLE_NAME = "Historico_prestamo";
 
-    // Método para insertar un nuevo registro de histórico de préstamo
+    /**
+     * Inserta un nuevo registro de historico de prestamo en la base de datos.
+     *
+     * @param historicoPrestamo El registro de historico de prestamo a insertar.
+     */
     public void insertarHistoricoPrestamo(HistoricoPrestamo historicoPrestamo) {
         String sql = "INSERT INTO Historico_prestamo (id_prestamo, dni_alumno, codigo_libro, fecha_prestamo, fecha_devolucion) VALUES (?, ?, ?, ?, ?)";
 
@@ -25,14 +33,16 @@ public class HistoricoPrestamoDAO {
             stmt.setTimestamp(5, Timestamp.valueOf(historicoPrestamo.getFechaDevolucion()));
 
             stmt.executeUpdate();
-            System.out.println("Histórico de préstamo insertado con éxito.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al insertar el histórico de préstamo.");
         }
     }
 
-    // Método para obtener todos los históricos de préstamos
+    /**
+     * Obtiene todos los registros de historicos de prestamos de la base de datos.
+     *
+     * @return Una lista con todos los registros de historicos de prestamos.
+     */
     public List<HistoricoPrestamo> obtenerTodosLosHistoricos() {
         List<HistoricoPrestamo> historicos = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME;
@@ -53,11 +63,15 @@ public class HistoricoPrestamoDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al obtener los históricos de préstamos.");
         }
         return historicos;
     }
 
+    /**
+     * Actualiza la fecha de devolucion de un registro de historico de prestamo.
+     *
+     * @param historico El registro de historico de prestamo con la fecha de devolucion actualizada.
+     */
     public void actualizarHistoricoPrestamo(HistoricoPrestamo historico) {
         String sql = "UPDATE Historico_prestamo SET fecha_devolucion = ? WHERE id_prestamo = ?";
 
@@ -67,10 +81,33 @@ public class HistoricoPrestamoDAO {
             stmt.setTimestamp(1, Timestamp.valueOf(historico.getFechaDevolucion()));
             stmt.setInt(2, historico.getIdPrestamo());
             stmt.executeUpdate();
-            System.out.println("Histórico de préstamo actualizado con éxito.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al actualizar el histórico de préstamo.");
+        }
+    }
+
+    /**
+     * Anula el dni de un alumno en el historial de prestamos, reemplazandolo por "ANONIMO".
+     *
+     * @param dni El dni del alumno a anular en los registros de historico de prestamo.
+     */
+    public void anularDniAlumno(String dni) {
+        String sql = "UPDATE Historico_prestamo SET dni_alumno = 'ANONIMO' WHERE dni_alumno = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, dni);
+            int filasAfectadas = stmt.executeUpdate();
+
+            if (filasAfectadas == 0) {
+                System.out.println("No se encontraron registros en Historico_prestamo con dni_alumno: " + dni);
+            } else {
+                System.out.println("Se actualizaron " + filasAfectadas + " registros en Historico_prestamo.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

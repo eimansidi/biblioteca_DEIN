@@ -7,11 +7,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase DAO que gestiona la conexion y operaciones CRUD para la tabla Libro.
+ * Permite insertar, obtener, actualizar y eliminar libros en la base de datos.
+ */
 public class LibroDAO {
 
     private static final String TABLE_NAME = "Libro";
 
-    // Método para insertar un nuevo libro
+    /**
+     * Inserta un nuevo libro en la base de datos.
+     *
+     * @param libro El libro a insertar.
+     */
     public void insertarLibro(Libro libro) {
         String sql = "INSERT INTO " + TABLE_NAME + " (titulo, autor, editorial, estado, baja, portada) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -26,14 +34,17 @@ public class LibroDAO {
             stmt.setInt(5, libro.getBaja());
             stmt.setBytes(6, libro.getPortada());
             stmt.executeUpdate();
-            System.out.println("Libro insertado con éxito.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al insertar el libro.");
         }
     }
 
-    // Método para obtener un libro por su código
+    /**
+     * Obtiene un libro de la base de datos utilizando su código.
+     *
+     * @param codigo El código del libro.
+     * @return El libro con el código especificado, o null si no se encuentra.
+     */
     public Libro obtenerLibroPorCodigo(int codigo) {
         Libro libro = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE codigo = ?";
@@ -57,12 +68,15 @@ public class LibroDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al obtener el libro.");
         }
         return libro;
     }
 
-    // Método para obtener todos los libros
+    /**
+     * Obtiene todos los libros de la base de datos.
+     *
+     * @return Una lista con todos los libros.
+     */
     public List<Libro> obtenerTodosLosLibros() {
         List<Libro> libros = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME;
@@ -85,12 +99,15 @@ public class LibroDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al obtener los libros.");
         }
         return libros;
     }
 
-    // Método para actualizar los datos de un libro
+    /**
+     * Actualiza los datos de un libro en la base de datos.
+     *
+     * @param libro El libro con los datos actualizados.
+     */
     public void actualizarLibro(Libro libro) {
         String sql = "UPDATE " + TABLE_NAME + " SET titulo = ?, autor = ?, editorial = ?, estado = ?, baja = ?, portada = ? WHERE codigo = ?";
 
@@ -105,26 +122,29 @@ public class LibroDAO {
             stmt.setBytes(6, libro.getPortada());
             stmt.setInt(7, libro.getCodigo());
             stmt.executeUpdate();
-            System.out.println("Libro actualizado con éxito.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al actualizar el libro.");
         }
     }
 
-    // Método para eliminar un libro
-    public void eliminarLibro(int codigo) {
-        String sql = "DELETE FROM " + TABLE_NAME + " WHERE codigo = ?";
+    /**
+     * Elimina un libro de la base de datos utilizando su código.
+     *
+     * @param codigo El código del libro a eliminar.
+     * @return true si el libro fue eliminado exitosamente, false si no se encontro o ocurrio un error.
+     */
+    public boolean eliminarLibro(int codigo) {
+        String sql = "DELETE FROM Libro WHERE codigo = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-            stmt.setInt(1, codigo);
-            stmt.executeUpdate();
-            System.out.println("Libro eliminado con éxito.");
+            pstmt.setInt(1, codigo);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al eliminar el libro.");
+            return false;
         }
     }
+
 }

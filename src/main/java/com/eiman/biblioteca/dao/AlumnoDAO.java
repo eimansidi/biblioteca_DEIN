@@ -7,11 +7,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase DAO que gestiona la conexion y operaciones CRUD para la tabla Alumno.
+ * Permite insertar, obtener, actualizar y eliminar alumnos en la base de datos.
+ */
 public class AlumnoDAO {
 
     private static final String TABLE_NAME = "Alumno";
 
-    // Método para insertar un nuevo alumno
+    /**
+     * Inserta un nuevo alumno en la base de datos.
+     * Si el alumno ya existe (mismo DNI), lanzara una excepcion.
+     *
+     * @param alumno El alumno a insertar.
+     */
     public void insertarAlumno(Alumno alumno) {
         String sql = "INSERT INTO Alumno (dni, nombre, apellido1, apellido2) VALUES (?, ?, ?, ?)";
 
@@ -24,17 +33,19 @@ public class AlumnoDAO {
             stmt.setString(4, alumno.getApellido2());
             stmt.executeUpdate();
 
-            System.out.println("Alumno insertado con éxito.");
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.err.println("Error: Ya existe un alumno con el mismo DNI.");
             throw new IllegalArgumentException("Ya existe un alumno con el mismo DNI.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al insertar el alumno.");
         }
     }
 
-    // Método para obtener un alumno por su DNI
+    /**
+     * Obtiene un alumno de la base de datos usando su DNI.
+     *
+     * @param dni El DNI del alumno.
+     * @return El alumno con el DNI especificado, o null si no se encuentra.
+     */
     public Alumno obtenerAlumnoPorDni(String dni) {
         Alumno alumno = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE dni = ?";
@@ -54,12 +65,15 @@ public class AlumnoDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al obtener el alumno.");
         }
         return alumno;
     }
 
-    // Método para obtener todos los alumnos
+    /**
+     * Obtiene todos los alumnos de la base de datos.
+     *
+     * @return Una lista con todos los alumnos.
+     */
     public List<Alumno> obtenerTodosLosAlumnos() {
         List<Alumno> alumnos = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME;
@@ -79,12 +93,15 @@ public class AlumnoDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al obtener los alumnos.");
         }
         return alumnos;
     }
 
-    // Método para actualizar los datos de un alumno
+    /**
+     * Actualiza los datos de un alumno en la base de datos.
+     *
+     * @param alumno El alumno con los datos actualizados.
+     */
     public void actualizarAlumno(Alumno alumno) {
         String sql = "UPDATE " + TABLE_NAME + " SET nombre = ?, apellido1 = ?, apellido2 = ? WHERE dni = ?";
 
@@ -95,25 +112,29 @@ public class AlumnoDAO {
             stmt.setString(3, alumno.getApellido2());
             stmt.setString(4, alumno.getDni());
             stmt.executeUpdate();
-            System.out.println("Alumno actualizado con éxito.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al actualizar el alumno.");
         }
     }
 
-    // Método para eliminar un alumno
-    public void eliminarAlumno(String dni) {
-        String sql = "DELETE FROM " + TABLE_NAME + " WHERE dni = ?";
+    /**
+     * Elimina un alumno de la base de datos usando su DNI.
+     *
+     * @param dni El DNI del alumno a eliminar.
+     * @return true si el alumno fue eliminado exitosamente, false si no se encontro o ocurrio un error.
+     */
+    public boolean eliminarAlumno(String dni) {
+        String sql = "DELETE FROM Alumno WHERE dni = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, dni);
-            stmt.executeUpdate();
-            System.out.println("Alumno eliminado con éxito.");
+            pstmt.setString(1, dni);
+            int affectedRows = pstmt.executeUpdate(); // Retorna numero de filas afectadas
+            return affectedRows > 0; // Si se elimino al menos 1 fila, devuelve true
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Error al eliminar el alumno.");
+            return false;
         }
     }
+
 }

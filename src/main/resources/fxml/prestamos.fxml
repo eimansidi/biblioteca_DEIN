@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.Pos?>
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.eiman.biblioteca.controllers.PrestamoController">
-    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="10">
-        <!-- Selección de Alumno y Libro -->
-        <Label text="Seleccionar Alumno:" />
-        <ComboBox fx:id="comboAlumnos"/>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../styles/style.css" fx:controller="com.eiman.biblioteca.controllers.PrestamoController">
+    <VBox alignment="CENTER" spacing="15" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20" AnchorPane.rightAnchor="20">
 
-        <Label text="Seleccionar Libro:" />
-        <ComboBox fx:id="comboLibros"/>
+        <Label text="%id.prestamo" />
 
-        <!-- Selección de fecha y hora del préstamo -->
-        <Label text="Fecha y Hora del Préstamo:" />
+        <HBox alignment="CENTER" spacing="10">
+            <Label text="Alumno:"/>
+            <ComboBox fx:id="comboAlumnos"/>
+        </HBox>
+
+        <HBox alignment="CENTER" spacing="10">
+            <Label text="Libro:"/>
+            <ComboBox fx:id="comboLibros"/>
+        </HBox>
+
+        <Label text="%label.fechaHoraPrestamo"/>
         <HBox spacing="10">
-            <DatePicker fx:id="datePrestamo"/>
+            <DatePicker fx:id="datePrestamo" />
             <Spinner fx:id="spinnerHora" min="0" max="23" initialValue="12"/>
             <Spinner fx:id="spinnerMinutos" min="0" max="59" initialValue="0"/>
         </HBox>
 
-        <!-- Botones para Guardar y Cancelar -->
-        <HBox spacing="10">
-            <Button text="Guardar" fx:id="btnGuardar" onAction="#guardarPrestamo"/>
-            <Button text="Cancelar" fx:id="btnCancelar" onAction="#cancelar"/>
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="btnGuardar" onAction="#guardarPrestamo" text="%guardar"/>
+            <Button fx:id="btnCancelar" onAction="#cancelar" text="%cancelar"/>
         </HBox>
     </VBox>
 </AnchorPane>

@@ -7,6 +7,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Clase que gestiona la conexion a la base de datos utilizando configuraciones cargadas desde un archivo de propiedades.
+ * Permite obtener una conexion a la base de datos y cerrarla.
+ */
 public class DatabaseConnection {
     private static final String URL;
     private static final String USER;
@@ -30,11 +34,17 @@ public class DatabaseConnection {
         }
     }
 
+    /**
+     * Obtiene una conexion a la base de datos.
+     * Si no hay una conexion activa o si esta cerrada, se crea una nueva conexion.
+     *
+     * @return La conexion activa a la base de datos.
+     * @throws RuntimeException Si ocurre un error al conectar con la base de datos.
+     */
     public static Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                System.out.println("Conexión exitosa a la base de datos.");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error al conectar con la base de datos", e);
@@ -42,13 +52,17 @@ public class DatabaseConnection {
         return connection;
     }
 
+    /**
+     * Cierra la conexion a la base de datos si esta abierta.
+     *
+     * @throws RuntimeException Si ocurre un error al cerrar la conexion.
+     */
     public static void closeConnection() {
         if (connection != null) {
             try {
                 connection.close();
-                System.out.println("Conexión cerrada.");
             } catch (SQLException e) {
-                System.err.println("Error al cerrar la conexión: " + e.getMessage());
+                System.err.println("Error al cerrar la conexion: " + e.getMessage());
             }
         }
     }

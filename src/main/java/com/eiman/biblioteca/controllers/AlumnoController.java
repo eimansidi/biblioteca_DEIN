@@ -2,11 +2,18 @@ package com.eiman.biblioteca.controllers;
 
 import com.eiman.biblioteca.dao.AlumnoDAO;
 import com.eiman.biblioteca.models.Alumno;
+import com.eiman.biblioteca.utils.LanguageManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 
+/**
+ * Controlador para la gestión de los alumnos.
+ * Este controlador maneja la interfaz de usuario relacionada con la adición y modificación de datos de alumnos.
+ * Permite insertar nuevos alumnos o actualizar los existentes.
+ */
 public class AlumnoController {
     @FXML private TextField txtDni, txtNombre, txtApellido1, txtApellido2;
     @FXML private Button btnGuardar, btnCancelar;
@@ -16,6 +23,27 @@ public class AlumnoController {
     private final AlumnoDAO alumnoDAO = new AlumnoDAO();
     private Alumno alumnoActual;
 
+    /**
+     * Inicializa los tooltips de los campos de entrada y botones.
+     * Asigna los textos de los tooltips desde el archivo de configuración de idioma.
+     */
+    @FXML
+    private void initialize() {
+        // Asignar tooltips manualmente desde el archivo de idioma
+        txtDni.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.dni")));
+        txtNombre.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.nombre")));
+        txtApellido1.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.apellido1")));
+        txtApellido2.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.apellido2")));
+
+        btnGuardar.setTooltip(new Tooltip(LanguageManager.getProperty("guardar")));
+        btnCancelar.setTooltip(new Tooltip(LanguageManager.getProperty("cancelar")));
+    }
+
+    /**
+     * Establece los datos de un alumno en los campos del formulario.
+     * Si el alumno no es nulo, se cargan sus datos en los campos de texto.
+     * @param alumno El alumno a cargar.
+     */
     public void setAlumno(Alumno alumno) {
         this.alumnoActual = alumno;
         if (alumno != null) {
@@ -23,10 +51,15 @@ public class AlumnoController {
             txtNombre.setText(alumno.getNombre());
             txtApellido1.setText(alumno.getApellido1());
             txtApellido2.setText(alumno.getApellido2());
-            txtDni.setDisable(true);
+            txtDni.setDisable(true);  // Desactiva el campo DNI para evitar su modificación
         }
     }
 
+    /**
+     * Guarda los datos del alumno. Si el alumno no existe, se crea uno nuevo,
+     * de lo contrario, se actualiza el existente.
+     * Actualiza la tabla después de guardar los cambios y cierra la ventana.
+     */
     @FXML
     private void guardarAlumno() {
         if (alumnoActual == null) {
@@ -47,15 +80,25 @@ public class AlumnoController {
         cerrarVentana();
     }
 
+    /**
+     * Establece el controlador principal de la ventana de la biblioteca.
+     * @param bibliotecaController El controlador principal de la ventana.
+     */
     public void setBibliotecaController(BibliotecaController bibliotecaController) {
         this.bibliotecaController = bibliotecaController;
     }
 
+    /**
+     * Cancela la operación y cierra la ventana sin guardar los cambios.
+     */
     @FXML
     private void cancelar() {
         cerrarVentana();
     }
 
+    /**
+     * Cierra la ventana actual.
+     */
     private void cerrarVentana() {
         Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
