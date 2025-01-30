@@ -1,0 +1,105 @@
+/* Estilos generales */
+.root {
+    -fx-background-color: #f4f4f4;
+    -fx-font-family: "Arial";
+}
+
+/* Estilos para la ventana principal */
+#mainContainer {
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}
+
+/* Estilos para la tabla */
+.table-view {
+    -fx-border-color: #ccc;
+    -fx-border-width: 1px;
+    -fx-background-color: white;
+}
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #4A90E2, #357ABD);
+}
+.table-view .column-header {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+.table-row-cell:odd {
+    -fx-background-color: #eef2f3;
+}
+.table-row-cell:even {
+    -fx-background-color: white;
+}
+.table-row-cell:selected {
+    -fx-background-color: #FFD700;
+    -fx-text-fill: black;
+}
+
+/* Estilos para los botones */
+.button {
+    -fx-background-color: #4A90E2;
+    -fx-text-fill: white;
+    -fx-padding: 10px 20px;
+    -fx-font-size: 14px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+.button:hover {
+    -fx-background-color: #357ABD;
+}
+.button:focused {
+    -fx-border-color: #357ABD;
+}
+
+/* Estilos específicos para eliminar */
+#btnEliminar {
+    -fx-background-color: #D9534F;
+}
+#btnEliminar:hover {
+    -fx-background-color: #C9302C;
+}
+
+/* Estilos para los formularios */
+.text-field, .choice-box, .combo-box {
+    -fx-padding: 8px;
+    -fx-border-color: #bbb;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 14px;
+}
+
+/* Estilos para los contenedores */
+.vbox, .hbox {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}
+
+/* Estilos para los labels */
+.label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #333;
+}
+
+/* Estilos para el menú desplegable */
+.menu-bar {
+    -fx-background-color: #4A90E2;
+    -fx-text-fill: white;
+}
+.menu-bar .menu-button:hover {
+    -fx-background-color: #357ABD;
+}
+
+/* Estilos para el icono y título */
+#headerContainer {
+    -fx-alignment: center;
+    -fx-spacing: 10px;
+}
+#iconImage {
+    -fx-fit-width: 50px;
+    -fx-fit-height: 50px;
+}
+#titleLabel {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Pos?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.eiman.biblioteca.controllers.HistoricoController">
+    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="10">
+        <!-- Lista de Préstamos Activos -->
+        <TableView fx:id="tablePrestamos" prefHeight="200" prefWidth="400">
+            <columns>
+                <TableColumn fx:id="colIdPrestamo" text="ID Préstamo" />
+                <TableColumn fx:id="colDniAlumno" text="DNI Alumno" />
+                <TableColumn fx:id="colCodigoLibro" text="Código Libro" />
+                <TableColumn fx:id="colFechaPrestamo" text="Fecha Préstamo" />
+            </columns>
+        </TableView>
+
+        <!-- Selección de fecha y hora de devolución -->
+        <Label text="Fecha y Hora de Devolución:" />
+        <HBox spacing="10">
+            <DatePicker fx:id="dateDevolucion"/>
+            <Spinner fx:id="spinnerHora" min="0" max="23" initialValue="12"/>
+            <Spinner fx:id="spinnerMinutos" min="0" max="59" initialValue="0"/>
+        </HBox>
+
+        <!-- Selección de estado del libro al devolver -->
+        <Label text="Estado del libro al devolver:" />
+        <ChoiceBox fx:id="choiceEstadoLibro">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Nuevo"/>
+                    <String fx:value="Usado nuevo"/>
+                    <String fx:value="Usado seminuevo"/>
+                    <String fx:value="Usado estropeado"/>
+                    <String fx:value="Restaurado"/>
+                </FXCollections>
+            </items>
+        </ChoiceBox>
+
+        <!-- Botón para devolver el préstamo seleccionado -->
+        <HBox spacing="10">
+            <Button text="Devolver Libro" fx:id="btnDevolver" onAction="#devolverLibro" />
+        </HBox>
+    </VBox>
+</AnchorPane>

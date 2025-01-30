@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Pos?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.eiman.biblioteca.controllers.LibroController">
+    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="10">
+        <TextField fx:id="txtTitulo" promptText="Título" />
+        <TextField fx:id="txtAutor" promptText="Autor" />
+        <TextField fx:id="txtEditorial" promptText="Editorial" />
+
+        <ChoiceBox fx:id="choiceEstado">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Nuevo"/>
+                    <String fx:value="Usado nuevo"/>
+                    <String fx:value="Usado seminuevo"/>
+                    <String fx:value="Usado estropeado"/>
+                    <String fx:value="Restaurado"/>
+                </FXCollections>
+            </items>
+        </ChoiceBox>
+
+        <CheckBox fx:id="chkBaja" text="¿Está de baja?" />
+
+        <!-- Contenedor horizontal para la imagen y los botones -->
+        <HBox spacing="10">
+            <!-- ImageView para mostrar la portada seleccionada -->
+            <ImageView fx:id="imgPortada" fitWidth="150" fitHeight="200" preserveRatio="true"/>
+
+            <VBox spacing="5">
+                <Button text="Seleccionar Portada" fx:id="btnSelectPortada" onAction="#selectPortada"/>
+                <Button text="Borrar Portada" fx:id="btnBorrarPortada" onAction="#removePortada"/>
+            </VBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <Button text="Guardar" fx:id="btnGuardar" onAction="#guardarLibro"/>
+            <Button text="Cancelar" fx:id="btnCancelar" onAction="#cancelar"/>
+        </HBox>
+    </VBox>
+</AnchorPane>

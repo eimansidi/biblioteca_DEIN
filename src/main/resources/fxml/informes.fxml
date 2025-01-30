@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Pos?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.eiman.biblioteca.controllers.InformesController">
+    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="10">
+        <Button text="Informe Alumnos" fx:id="btnInformeAlumnos" onAction="#generarInformeAlumnos"/>
+        <Button text="Informe Libros" fx:id="btnInformeLibros" onAction="#generarInformeLibros"/>
+        <Button text="Informe Prestamos" fx:id="btnInformePrestamos" onAction="#generarInformePrestamos"/>
+        <Button text="Informe Histórico Préstamos" fx:id="btnInformeHistorico" onAction="#generarInformeHistorico"/>
+    </VBox>
+</AnchorPane>

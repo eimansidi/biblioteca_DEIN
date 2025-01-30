@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Pos?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.eiman.biblioteca.controllers.ModifyHistoricoController">
+    <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="10">
+
+        <!-- Información del préstamo -->
+        <Label text="Información del Préstamo" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Label fx:id="lblAlumno" text="Alumno: " />
+        <Label fx:id="lblLibro" text="Libro: " />
+
+        <!-- Modificación de Fecha y Hora -->
+        <Label text="Modificar Fecha y Hora de Devolución:" />
+        <HBox spacing="10">
+            <DatePicker fx:id="dateDevolucion"/>
+            <Spinner fx:id="spinnerHora" min="0" max="23" initialValue="12"/>
+            <Spinner fx:id="spinnerMinutos" min="0" max="59" initialValue="0"/>
+        </HBox>
+
+        <!-- Modificación del estado del libro -->
+        <Label text="Modificar Estado del Libro:" />
+        <ChoiceBox fx:id="choiceEstadoLibro">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Nuevo"/>
+                    <String fx:value="Usado nuevo"/>
+                    <String fx:value="Usado seminuevo"/>
+                    <String fx:value="Usado estropeado"/>
+                    <String fx:value="Restaurado"/>
+                </FXCollections>
+            </items>
+        </ChoiceBox>
+
+        <!-- Botones de acción -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="Guardar Cambios" fx:id="btnGuardar" onAction="#guardarCambios"/>
+            <Button text="Cancelar" fx:id="btnCancelar" onAction="#cancelar"/>
+        </HBox>
+    </VBox>
+</AnchorPane>
