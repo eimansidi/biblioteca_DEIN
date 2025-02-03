@@ -8,6 +8,8 @@ import javafx.scene.control.Tooltip;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controlador para la ventana de informes.
@@ -15,6 +17,8 @@ import java.util.Map;
  * como los informes de alumnos, libros, préstamos y el histórico de préstamos.
  */
 public class InformesController {
+    private static final Logger logger = Logger.getLogger(InformesController.class.getName());
+
     @FXML private Button btnInformeAlumnos, btnInformeLibros, btnInformePrestamos, btnInformeHistorico;
 
     /**
@@ -23,11 +27,15 @@ public class InformesController {
      */
     @FXML
     private void initialize() {
-        // Asignar tooltips manualmente desde el archivo de idioma
-        btnInformeAlumnos.setTooltip(new Tooltip(LanguageManager.getProperty("button.informeAlumnos")));
-        btnInformeLibros.setTooltip(new Tooltip(LanguageManager.getProperty("button.informeLibros")));
-        btnInformePrestamos.setTooltip(new Tooltip(LanguageManager.getProperty("button.informePrestamos")));
-        btnInformeHistorico.setTooltip(new Tooltip(LanguageManager.getProperty("button.informeHistorico")));
+        logger.info("Inicializando la ventana de informes.");
+        try {
+            btnInformeAlumnos.setTooltip(new Tooltip(LanguageManager.getProperty("button.informeAlumnos")));
+            btnInformeLibros.setTooltip(new Tooltip(LanguageManager.getProperty("button.informeLibros")));
+            btnInformePrestamos.setTooltip(new Tooltip(LanguageManager.getProperty("button.informePrestamos")));
+            btnInformeHistorico.setTooltip(new Tooltip(LanguageManager.getProperty("button.informeHistorico")));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al inicializar la ventana de informes.", e);
+        }
     }
 
     /**
@@ -35,6 +43,7 @@ public class InformesController {
      */
     @FXML
     private void generarInformeAlumnos() {
+        logger.info("Generando informe de alumnos.");
         generarInforme("reporte_alumnos", new HashMap<>());
     }
 
@@ -43,6 +52,7 @@ public class InformesController {
      */
     @FXML
     private void generarInformeLibros() {
+        logger.info("Generando informe de libros.");
         generarInforme("listado_libros", new HashMap<>());
     }
 
@@ -51,6 +61,7 @@ public class InformesController {
      */
     @FXML
     private void generarInformePrestamos() {
+        logger.info("Generando informe de préstamos.");
         generarInforme("prestamo_informe", new HashMap<>());
     }
 
@@ -59,6 +70,7 @@ public class InformesController {
      */
     @FXML
     private void generarInformeHistorico() {
+        logger.info("Generando informe del histórico de préstamos.");
         generarInforme("estadisticas_prestamos", new HashMap<>());
     }
 
@@ -68,7 +80,11 @@ public class InformesController {
      * @param parametros Parámetros adicionales para el informe.
      */
     private void generarInforme(String nombreReporte, Map<String, Object> parametros) {
-        // Genera el informe con el nombre y parámetros especificados
-        ReportGenerator.generateReport(nombreReporte, null, parametros);
+        try {
+            logger.info("Generando informe: " + nombreReporte);
+            ReportGenerator.generateReport(nombreReporte, null, parametros);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al generar el informe: " + nombreReporte, e);
+        }
     }
 }

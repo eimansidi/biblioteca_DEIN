@@ -11,10 +11,13 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
  * así como la selección de los libros disponibles y la configuración de la fecha y hora de préstamo.
  */
 public class PrestamoController {
+    private static final Logger logger = Logger.getLogger(PrestamoController.class.getName());
+
     @FXML private ComboBox<Alumno> comboAlumnos;
     @FXML private ComboBox<Libro> comboLibros;
     @FXML private DatePicker datePrestamo;
@@ -42,22 +47,25 @@ public class PrestamoController {
      */
     @FXML
     private void initialize() {
-        cargarAlumnos();
-        cargarLibrosDisponibles();
+        logger.info("Inicializando la ventana de gestión de préstamos.");
+        try {
+            cargarAlumnos();
+            cargarLibrosDisponibles();
 
-        // Configurar los spinners de hora y minutos con los valores actuales
-        datePrestamo.setValue(LocalDate.now());
-        spinnerHora.getValueFactory().setValue(LocalTime.now().getHour());
-        spinnerMinutos.getValueFactory().setValue(LocalTime.now().getMinute());
+            datePrestamo.setValue(LocalDate.now());
+            spinnerHora.getValueFactory().setValue(LocalTime.now().getHour());
+            spinnerMinutos.getValueFactory().setValue(LocalTime.now().getMinute());
 
-        // Asignar tooltips manualmente desde el archivo de idioma
-        comboAlumnos.setTooltip(new Tooltip(LanguageManager.getProperty("selecciona.alumno")));
-        comboLibros.setTooltip(new Tooltip(LanguageManager.getProperty("selecciona.libro")));
-        datePrestamo.setTooltip(new Tooltip(LanguageManager.getProperty("fecha.prestamo")));
-        spinnerHora.setTooltip(new Tooltip(LanguageManager.getProperty("hora.devolucion")));
-        spinnerMinutos.setTooltip(new Tooltip(LanguageManager.getProperty("minutos.devolucion")));
-        btnGuardar.setTooltip(new Tooltip(LanguageManager.getProperty("guardar")));
-        btnCancelar.setTooltip(new Tooltip(LanguageManager.getProperty("cancelar")));
+            comboAlumnos.setTooltip(new Tooltip(LanguageManager.getProperty("selecciona.alumno")));
+            comboLibros.setTooltip(new Tooltip(LanguageManager.getProperty("selecciona.libro")));
+            datePrestamo.setTooltip(new Tooltip(LanguageManager.getProperty("fecha.prestamo")));
+            spinnerHora.setTooltip(new Tooltip(LanguageManager.getProperty("hora.devolucion")));
+            spinnerMinutos.setTooltip(new Tooltip(LanguageManager.getProperty("minutos.devolucion")));
+            btnGuardar.setTooltip(new Tooltip(LanguageManager.getProperty("guardar")));
+            btnCancelar.setTooltip(new Tooltip(LanguageManager.getProperty("cancelar")));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al inicializar la ventana de gestión de préstamos.", e);
+        }
     }
 
     /**
@@ -65,13 +73,18 @@ public class PrestamoController {
      * @param prestamo El préstamo a editar.
      */
     public void setPrestamo(Prestamo prestamo) {
-        this.prestamoActual = prestamo;
-        if (prestamo != null) {
-            comboAlumnos.setValue(alumnoDAO.obtenerAlumnoPorDni(prestamo.getDniAlumno()));
-            comboLibros.setValue(libroDAO.obtenerLibroPorCodigo(prestamo.getCodigoLibro()));
-            datePrestamo.setValue(prestamo.getFechaPrestamo().toLocalDate());
-            spinnerHora.getValueFactory().setValue(prestamo.getFechaPrestamo().getHour());
-            spinnerMinutos.getValueFactory().setValue(prestamo.getFechaPrestamo().getMinute());
+        logger.info("Cargando datos del préstamo para edición.");
+        try {
+            this.prestamoActual = prestamo;
+            if (prestamo != null) {
+                comboAlumnos.setValue(alumnoDAO.obtenerAlumnoPorDni(prestamo.getDniAlumno()));
+                comboLibros.setValue(libroDAO.obtenerLibroPorCodigo(prestamo.getCodigoLibro()));
+                datePrestamo.setValue(prestamo.getFechaPrestamo().toLocalDate());
+                spinnerHora.getValueFactory().setValue(prestamo.getFechaPrestamo().getHour());
+                spinnerMinutos.getValueFactory().setValue(prestamo.getFechaPrestamo().getMinute());
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al cargar los datos del préstamo para edición.", e);
         }
     }
 
@@ -79,24 +92,34 @@ public class PrestamoController {
      * Carga todos los alumnos disponibles en el ComboBox de alumnos.
      */
     private void cargarAlumnos() {
-        List<Alumno> alumnos = alumnoDAO.obtenerTodosLosAlumnos();
-        comboAlumnos.setItems(FXCollections.observableArrayList(alumnos));
+        logger.info("Cargando lista de alumnos.");
+        try {
+            List<Alumno> alumnos = alumnoDAO.obtenerTodosLosAlumnos();
+            comboAlumnos.setItems(FXCollections.observableArrayList(alumnos));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al cargar la lista de alumnos.", e);
+        }
     }
 
     /**
      * Carga los libros disponibles para préstamo, excluyendo los que están prestados o dados de baja.
      */
     private void cargarLibrosDisponibles() {
-        List<Libro> libros = libroDAO.obtenerTodosLosLibros();
-        List<Integer> librosPrestados = prestamoDAO.obtenerTodosLosPrestamos().stream()
-                .map(Prestamo::getCodigoLibro)
-                .collect(Collectors.toList());
+        logger.info("Cargando lista de libros disponibles para préstamo.");
+        try {
+            List<Libro> libros = libroDAO.obtenerTodosLosLibros();
+            List<Integer> librosPrestados = prestamoDAO.obtenerTodosLosPrestamos().stream()
+                    .map(Prestamo::getCodigoLibro)
+                    .collect(Collectors.toList());
 
-        comboLibros.setItems(FXCollections.observableArrayList(
-                libros.stream()
-                        .filter(libro -> libro.getBaja() == 0 && !librosPrestados.contains(libro.getCodigo()))
-                        .collect(Collectors.toList())
-        ));
+            comboLibros.setItems(FXCollections.observableArrayList(
+                    libros.stream()
+                            .filter(libro -> libro.getBaja() == 0 && !librosPrestados.contains(libro.getCodigo()))
+                            .collect(Collectors.toList())
+            ));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al cargar la lista de libros disponibles.", e);
+        }
     }
 
     /**
@@ -105,42 +128,46 @@ public class PrestamoController {
      */
     @FXML
     private void guardarPrestamo() {
-        Alumno alumnoSeleccionado = comboAlumnos.getValue();
-        Libro libroSeleccionado = comboLibros.getValue();
+        logger.info("Intentando guardar el préstamo.");
+        try {
+            Alumno alumnoSeleccionado = comboAlumnos.getValue();
+            Libro libroSeleccionado = comboLibros.getValue();
 
-        if (alumnoSeleccionado == null || libroSeleccionado == null) {
-            mostrarAlerta(LanguageManager.getProperty("selecciona.alumno.libro")); // "Debe seleccionar un alumno y un libro."
-            return;
+            if (alumnoSeleccionado == null || libroSeleccionado == null) {
+                mostrarAlerta(LanguageManager.getProperty("selecciona.alumno.libro"));
+                return;
+            }
+
+            LocalDate fechaSeleccionada = datePrestamo.getValue();
+            if (fechaSeleccionada == null) {
+                mostrarAlerta(LanguageManager.getProperty("selecciona.fecha.prestamo"));
+                return;
+            }
+
+            int horaSeleccionada = spinnerHora.getValue();
+            int minutosSeleccionados = spinnerMinutos.getValue();
+            LocalTime horaPrestamo = LocalTime.of(horaSeleccionada, minutosSeleccionados);
+            LocalDateTime fechaHoraPrestamo = LocalDateTime.of(fechaSeleccionada, horaPrestamo);
+
+            if (prestamoActual == null) {
+                prestamoActual = new Prestamo(0, alumnoSeleccionado.getDni(), libroSeleccionado.getCodigo(), fechaHoraPrestamo);
+                prestamoDAO.insertarPrestamo(prestamoActual);
+            } else {
+                prestamoActual.setDniAlumno(alumnoSeleccionado.getDni());
+                prestamoActual.setCodigoLibro(libroSeleccionado.getCodigo());
+                prestamoActual.setFechaPrestamo(fechaHoraPrestamo);
+                prestamoDAO.actualizarPrestamo(prestamoActual);
+            }
+
+            if (bibliotecaController != null) {
+                bibliotecaController.actualizarTablaActual();
+            }
+
+            logger.info("Préstamo guardado correctamente.");
+            cerrarVentana();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al guardar el préstamo.", e);
         }
-
-        LocalDate fechaSeleccionada = datePrestamo.getValue();
-        if (fechaSeleccionada == null) {
-            mostrarAlerta(LanguageManager.getProperty("selecciona.fecha.prestamo")); // "Debe seleccionar una fecha de préstamo."
-            return;
-        }
-
-        int horaSeleccionada = spinnerHora.getValue();
-        int minutosSeleccionados = spinnerMinutos.getValue();
-        LocalTime horaPrestamo = LocalTime.of(horaSeleccionada, minutosSeleccionados);
-
-        LocalDateTime fechaHoraPrestamo = LocalDateTime.of(fechaSeleccionada, horaPrestamo);
-
-        if (prestamoActual == null) {
-            prestamoActual = new Prestamo(0, alumnoSeleccionado.getDni(), libroSeleccionado.getCodigo(), fechaHoraPrestamo);
-            prestamoDAO.insertarPrestamo(prestamoActual);
-        } else {
-            prestamoActual.setDniAlumno(alumnoSeleccionado.getDni());
-            prestamoActual.setCodigoLibro(libroSeleccionado.getCodigo());
-            prestamoActual.setFechaPrestamo(fechaHoraPrestamo);
-            prestamoDAO.actualizarPrestamo(prestamoActual);
-        }
-
-        // Actualizar la tabla después de guardar
-        if (bibliotecaController != null) {
-            bibliotecaController.actualizarTablaActual();
-        }
-
-        cerrarVentana();
     }
 
     /**
@@ -148,6 +175,7 @@ public class PrestamoController {
      * @param mensaje El mensaje a mostrar en la alerta.
      */
     private void mostrarAlerta(String mensaje) {
+        logger.warning("Mostrando alerta: " + mensaje);
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(LanguageManager.getProperty("advertencia"));
         alert.setHeaderText(null);
@@ -160,6 +188,7 @@ public class PrestamoController {
      * @param bibliotecaController El controlador principal de la ventana.
      */
     public void setBibliotecaController(BibliotecaController bibliotecaController) {
+        logger.info("Estableciendo referencia al controlador principal de la biblioteca.");
         this.bibliotecaController = bibliotecaController;
     }
 
@@ -168,6 +197,7 @@ public class PrestamoController {
      */
     @FXML
     private void cancelar() {
+        logger.info("Operación cancelada por el usuario.");
         cerrarVentana();
     }
 
@@ -175,6 +205,7 @@ public class PrestamoController {
      * Cierra la ventana actual.
      */
     private void cerrarVentana() {
+        logger.info("Cerrando ventana de gestión de préstamos.");
         Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
     }

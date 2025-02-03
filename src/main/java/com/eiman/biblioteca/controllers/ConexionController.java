@@ -52,8 +52,7 @@ public class ConexionController {
         try {
             DatabaseConnection.setConnectionData(url, user, password);
             DatabaseConnection.getConnection();
-            statusLabel.setText("Conexión de prueba exitosa.");
-            logger.info("Conexión exitosa.");
+            statusLabel.setText("Conexión de exitosa.");
             connectButton.setDisable(false); // Habilitar el botón de conexión si la prueba fue exitosa
         } catch (Exception e) {
             statusLabel.setText("Error al probar la conexión.");

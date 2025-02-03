@@ -6,13 +6,15 @@ import com.eiman.biblioteca.utils.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Clase DAO que gestiona la conexion y operaciones CRUD para la tabla Libro.
+ * Clase DAO que gestiona la conexión y operaciones CRUD para la tabla Libro.
  * Permite insertar, obtener, actualizar y eliminar libros en la base de datos.
  */
 public class LibroDAO {
-
+    private static final Logger logger = Logger.getLogger(LibroDAO.class.getName());
     private static final String TABLE_NAME = "Libro";
 
     /**
@@ -21,6 +23,7 @@ public class LibroDAO {
      * @param libro El libro a insertar.
      */
     public void insertarLibro(Libro libro) {
+        logger.info("Intentando insertar un nuevo libro: " + libro.getTitulo());
         String sql = "INSERT INTO " + TABLE_NAME + " (titulo, autor, editorial, estado, baja, portada) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -34,8 +37,10 @@ public class LibroDAO {
             stmt.setInt(5, libro.getBaja());
             stmt.setBytes(6, libro.getPortada());
             stmt.executeUpdate();
+            logger.info("Libro insertado exitosamente: " + libro.getTitulo());
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al insertar el libro: " + libro.getTitulo(), e);
         }
     }
 
@@ -46,6 +51,7 @@ public class LibroDAO {
      * @return El libro con el código especificado, o null si no se encuentra.
      */
     public Libro obtenerLibroPorCodigo(int codigo) {
+        logger.info("Buscando libro con código: " + codigo);
         Libro libro = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE codigo = ?";
 
@@ -65,21 +71,26 @@ public class LibroDAO {
                         rs.getInt("baja"),
                         rs.getBytes("portada")
                 );
+                logger.info("Libro encontrado: " + libro.getTitulo());
+            } else {
+                logger.warning("No se encontró ningún libro con código: " + codigo);
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al obtener el libro con código: " + codigo, e);
         }
         return libro;
     }
 
     /**
-     * Obtiene todos los libros de la base de datos.
+     * Obtiene todos los libros disponibles (que no están dados de baja) de la base de datos.
      *
-     * @return Una lista con todos los libros.
+     * @return Una lista con todos los libros disponibles.
      */
     public List<Libro> obtenerTodosLosLibros() {
+        logger.info("Obteniendo lista de todos los libros disponibles.");
         List<Libro> libros = new ArrayList<>();
-        String sql = "SELECT * FROM " + TABLE_NAME;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE baja=0";
 
         try (Connection connection = DatabaseConnection.getConnection();
              Statement stmt = connection.createStatement();
@@ -97,8 +108,10 @@ public class LibroDAO {
                 );
                 libros.add(libro);
             }
+            logger.info("Total de libros obtenidos: " + libros.size());
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al obtener la lista de libros.", e);
         }
         return libros;
     }
@@ -109,6 +122,7 @@ public class LibroDAO {
      * @param libro El libro con los datos actualizados.
      */
     public void actualizarLibro(Libro libro) {
+        logger.info("Actualizando información del libro con código: " + libro.getCodigo());
         String sql = "UPDATE " + TABLE_NAME + " SET titulo = ?, autor = ?, editorial = ?, estado = ?, baja = ?, portada = ? WHERE codigo = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
@@ -121,9 +135,16 @@ public class LibroDAO {
             stmt.setInt(5, libro.getBaja());
             stmt.setBytes(6, libro.getPortada());
             stmt.setInt(7, libro.getCodigo());
-            stmt.executeUpdate();
+
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                logger.info("Libro actualizado correctamente con código: " + libro.getCodigo());
+            } else {
+                logger.warning("No se encontró el libro con código: " + libro.getCodigo() + " para actualizar.");
+            }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al actualizar el libro con código: " + libro.getCodigo(), e);
         }
     }
 
@@ -131,20 +152,29 @@ public class LibroDAO {
      * Elimina un libro de la base de datos utilizando su código.
      *
      * @param codigo El código del libro a eliminar.
-     * @return true si el libro fue eliminado exitosamente, false si no se encontro o ocurrio un error.
+     * @return true si el libro fue eliminado exitosamente, false si no se encontró o ocurrió un error.
      */
     public boolean eliminarLibro(int codigo) {
+        logger.info("Intentando eliminar el libro con código: " + codigo);
         String sql = "DELETE FROM Libro WHERE codigo = ?";
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, codigo);
             int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+
+            if (affectedRows > 0) {
+                logger.info("Libro eliminado exitosamente con código: " + codigo);
+                return true;
+            } else {
+                logger.warning("No se encontró el libro con código: " + codigo + " para eliminar.");
+                return false;
+            }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al eliminar el libro con código: " + codigo, e);
             return false;
         }
     }
-
 }

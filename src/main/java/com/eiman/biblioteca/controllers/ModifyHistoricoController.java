@@ -11,8 +11,11 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controlador para la ventana de modificación del historial de préstamos.
@@ -20,6 +23,7 @@ import java.time.LocalTime;
  * así como actualizar el estado del libro en el historial de préstamos.
  */
 public class ModifyHistoricoController {
+    private static final Logger logger = Logger.getLogger(ModifyHistoricoController.class.getName());
 
     @FXML private Label lblAlumno;
     @FXML private Label lblLibro;
@@ -39,21 +43,25 @@ public class ModifyHistoricoController {
      * de los campos y cargando los valores predeterminados desde el archivo de idioma.
      */
     public void initialize() {
-        dateDevolucion.setTooltip(new Tooltip(LanguageManager.getProperty("fecha.devolucion")));
-        spinnerHora.setTooltip(new Tooltip(LanguageManager.getProperty("hora.devolucion")));
-        spinnerMinutos.setTooltip(new Tooltip(LanguageManager.getProperty("minutos.devolucion")));
-        choiceEstadoLibro.setTooltip(new Tooltip(LanguageManager.getProperty("selecciona.estado")));
-        btnGuardar.setTooltip(new Tooltip(LanguageManager.getProperty("guardar")));
-        btnCancelar.setTooltip(new Tooltip(LanguageManager.getProperty("cancelar")));
+        logger.info("Inicializando la ventana de modificación del historial de préstamos.");
+        try {
+            dateDevolucion.setTooltip(new Tooltip(LanguageManager.getProperty("fecha.devolucion")));
+            spinnerHora.setTooltip(new Tooltip(LanguageManager.getProperty("hora.devolucion")));
+            spinnerMinutos.setTooltip(new Tooltip(LanguageManager.getProperty("minutos.devolucion")));
+            choiceEstadoLibro.setTooltip(new Tooltip(LanguageManager.getProperty("selecciona.estado")));
+            btnGuardar.setTooltip(new Tooltip(LanguageManager.getProperty("guardar")));
+            btnCancelar.setTooltip(new Tooltip(LanguageManager.getProperty("cancelar")));
 
-        // Cargar valores desde el archivo de idioma para los estados de los libros
-        choiceEstadoLibro.setItems(FXCollections.observableArrayList(
-                LanguageManager.getProperty("nuevo"),
-                LanguageManager.getProperty("usado.nuevo"),
-                LanguageManager.getProperty("usado.seminuevo"),
-                LanguageManager.getProperty("usado.estropeado"),
-                LanguageManager.getProperty("restaurado")
-        ));
+            choiceEstadoLibro.setItems(FXCollections.observableArrayList(
+                    LanguageManager.getProperty("nuevo"),
+                    LanguageManager.getProperty("usado.nuevo"),
+                    LanguageManager.getProperty("usado.seminuevo"),
+                    LanguageManager.getProperty("usado.estropeado"),
+                    LanguageManager.getProperty("restaurado")
+            ));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al inicializar la ventana de modificación del historial de préstamos.", e);
+        }
     }
 
     /**
@@ -62,24 +70,27 @@ public class ModifyHistoricoController {
      * @param historico El historial de préstamo a modificar.
      */
     public void setHistorico(HistoricoPrestamo historico) {
-        this.historicoActual = historico;
+        logger.info("Cargando datos del historial de préstamo para modificación.");
+        try {
+            this.historicoActual = historico;
 
-        // Obtener el nombre del alumno
-        Alumno alumno = alumnoDAO.obtenerAlumnoPorDni(historico.getDniAlumno());
-        lblAlumno.setText((LanguageManager.getProperty("alumno")) + " " + (alumno != null ? alumno.getNombre() + " " + alumno.getApellido1() : (LanguageManager.getProperty("desconocido"))));
+            Alumno alumno = alumnoDAO.obtenerAlumnoPorDni(historico.getDniAlumno());
+            lblAlumno.setText((LanguageManager.getProperty("alumno")) + " " +
+                    (alumno != null ? alumno.getNombre() + " " + alumno.getApellido1() : LanguageManager.getProperty("desconocido")));
 
-        // Obtener el título del libro
-        Libro libro = libroDAO.obtenerLibroPorCodigo(historico.getCodigoLibro());
-        lblLibro.setText((LanguageManager.getProperty("libro")) + " " + (libro != null ? libro.getTitulo() : (LanguageManager.getProperty("desconocido"))));
+            Libro libro = libroDAO.obtenerLibroPorCodigo(historico.getCodigoLibro());
+            lblLibro.setText((LanguageManager.getProperty("libro")) + " " +
+                    (libro != null ? libro.getTitulo() : LanguageManager.getProperty("desconocido")));
 
-        // Cargar fecha y hora
-        dateDevolucion.setValue(historico.getFechaDevolucion().toLocalDate());
-        spinnerHora.getValueFactory().setValue(historico.getFechaDevolucion().getHour());
-        spinnerMinutos.getValueFactory().setValue(historico.getFechaDevolucion().getMinute());
+            dateDevolucion.setValue(historico.getFechaDevolucion().toLocalDate());
+            spinnerHora.getValueFactory().setValue(historico.getFechaDevolucion().getHour());
+            spinnerMinutos.getValueFactory().setValue(historico.getFechaDevolucion().getMinute());
 
-        // Cargar estado del libro
-        if (libro != null) {
-            choiceEstadoLibro.setValue(libro.getEstado());
+            if (libro != null) {
+                choiceEstadoLibro.setValue(libro.getEstado());
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al cargar los datos del historial de préstamo.", e);
         }
     }
 
@@ -89,33 +100,35 @@ public class ModifyHistoricoController {
      */
     @FXML
     private void guardarCambios() {
-        if (dateDevolucion.getValue() == null) {
-            mostrarAlerta(LanguageManager.getProperty("selecciona.fecha.devolucion")); // "Debe seleccionar una fecha de devolución."
-            return;
-        }
-
-        // Actualizar la fecha y hora de devolución
-        LocalDateTime nuevaFechaDevolucion = LocalDateTime.of(
-                dateDevolucion.getValue(),
-                LocalTime.of(spinnerHora.getValue(), spinnerMinutos.getValue())
-        );
-        historicoActual.setFechaDevolucion(nuevaFechaDevolucion);
-
-        // Actualizar el estado del libro
-        String nuevoEstado = choiceEstadoLibro.getValue();
-        if (nuevoEstado != null) {
-            Libro libro = libroDAO.obtenerLibroPorCodigo(historicoActual.getCodigoLibro());
-            if (libro != null) {
-                libro.setEstado(nuevoEstado);
-                libroDAO.actualizarLibro(libro);
+        logger.info("Intentando guardar cambios en el historial de préstamo.");
+        try {
+            if (dateDevolucion.getValue() == null) {
+                mostrarAlerta(LanguageManager.getProperty("selecciona.fecha.devolucion"));
+                return;
             }
+
+            LocalDateTime nuevaFechaDevolucion = LocalDateTime.of(
+                    dateDevolucion.getValue(),
+                    LocalTime.of(spinnerHora.getValue(), spinnerMinutos.getValue())
+            );
+            historicoActual.setFechaDevolucion(nuevaFechaDevolucion);
+
+            String nuevoEstado = choiceEstadoLibro.getValue();
+            if (nuevoEstado != null) {
+                Libro libro = libroDAO.obtenerLibroPorCodigo(historicoActual.getCodigoLibro());
+                if (libro != null) {
+                    libro.setEstado(nuevoEstado);
+                    libroDAO.actualizarLibro(libro);
+                }
+            }
+
+            historicoPrestamoDAO.actualizarHistoricoPrestamo(historicoActual);
+
+            logger.info("Historial de préstamo actualizado correctamente.");
+            cerrarVentana();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al guardar cambios en el historial de préstamo.", e);
         }
-
-        // Guardar cambios en la base de datos
-        historicoPrestamoDAO.actualizarHistoricoPrestamo(historicoActual);
-
-        // Cerrar ventana
-        cerrarVentana();
     }
 
     /**
@@ -123,6 +136,7 @@ public class ModifyHistoricoController {
      */
     @FXML
     private void cancelar() {
+        logger.info("Operación cancelada por el usuario.");
         cerrarVentana();
     }
 
@@ -130,6 +144,7 @@ public class ModifyHistoricoController {
      * Cierra la ventana actual.
      */
     private void cerrarVentana() {
+        logger.info("Cerrando ventana de modificación del historial de préstamo.");
         Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
     }
@@ -139,6 +154,7 @@ public class ModifyHistoricoController {
      * @param mensaje El mensaje a mostrar en la alerta.
      */
     private void mostrarAlerta(String mensaje) {
+        logger.warning("Mostrando alerta: " + mensaje);
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(LanguageManager.getProperty("advertencia"));
         alert.setHeaderText(null);

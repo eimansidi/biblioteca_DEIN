@@ -3,28 +3,36 @@ package com.eiman.biblioteca.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import java.io.File;
+
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Controlador para la ventana de ayuda.
- * Este controlador maneja la carga del archivo HTML que contiene la guía rápida de la aplicación,
- * mostrando su contenido en un componente WebView.
+ * Controlador de la ventana de ayuda que carga un archivo HTML en un WebView.
  */
 public class HelpController {
 
-    @FXML
-    private WebView webViewHelp;
+    @FXML private WebView webView;
+    private static final Logger logger = Logger.getLogger(HelpController.class.getName());
 
     /**
-     * Inicializa la vista de la ayuda cargando el archivo HTML correspondiente en el WebView.
-     * Utiliza el motor WebEngine para cargar y mostrar el archivo HTML de la guía rápida.
+     * Carga el archivo HTML en el WebView.
+     * @param archivoHtml Ruta del archivo HTML a cargar.
      */
-    @FXML
-    public void initialize() {
-        WebEngine webEngine = webViewHelp.getEngine();
-        // Ruta al archivo de ayuda (guía rápida en formato HTML)
-        File file = new File("src/main/resources/help/guia.html");
-        // Cargar el archivo HTML en el WebView
-        webEngine.load(file.toURI().toString());
+    public void cargarHTML(String archivoHtml) {
+        if (webView == null) {
+            logger.severe("Error: webView no está inicializado.");
+            return;
+        }
+
+        WebEngine webEngine = webView.getEngine();
+        URL url = getClass().getResource(archivoHtml);
+        if (url != null) {
+            webEngine.load(url.toExternalForm());
+            logger.info("Archivo HTML cargado correctamente: " + archivoHtml);
+        } else {
+            logger.severe("Error: No se pudo cargar el archivo HTML " + archivoHtml);
+        }
     }
 }

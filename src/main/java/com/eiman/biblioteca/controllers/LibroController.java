@@ -15,19 +15,17 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 /**
- * Controlador para la ventana de gestión de libros.
- * Este controlador maneja la edición de los detalles de un libro,
- * incluyendo el título, autor, editorial, estado, baja y portada.
+ * Controlador para la ventana de gestion de libros.
+ * Este controlador maneja la edicion de los detalles de un libro,
+ * incluyendo el titulo, autor, editorial, estado, baja y portada.
  */
 public class LibroController {
     @FXML private TextField txtTitulo, txtAutor, txtEditorial;
     @FXML private CheckBox chkBaja;
     @FXML private Button btnGuardar, btnCancelar, btnSelectPortada, btnBorrarPortada;
-    @FXML private ImageView imgPortada; // Agregado para mostrar la imagen seleccionada
+    @FXML private ImageView imgPortada;
 
     private BibliotecaController bibliotecaController;
 
@@ -85,13 +83,15 @@ public class LibroController {
 
     /**
      * Guarda el libro en la base de datos. Si el libro es nuevo, se inserta,
-     * de lo contrario, se actualiza su información.
+     * de lo contrario, se actualiza su informacion.
+     * Si el libro pasa a baja=1, dejara de mostrarse en la tabla de libros tras recargarla.
      */
     @FXML
     private void guardarLibro() {
         if (libroActual == null) {
+            // Libro nuevo
             libroActual = new Libro(
-                    0, // Código generado por la BD si es AUTO_INCREMENT
+                    0, // Codigo generado por la BD si es AUTO_INCREMENT
                     txtTitulo.getText(),
                     txtAutor.getText(),
                     txtEditorial.getText(),
@@ -101,6 +101,7 @@ public class LibroController {
             );
             libroDAO.insertarLibro(libroActual);
         } else {
+            // Actualizar libro existente
             libroActual.setTitulo(txtTitulo.getText());
             libroActual.setAutor(txtAutor.getText());
             libroActual.setEditorial(txtEditorial.getText());
@@ -110,7 +111,7 @@ public class LibroController {
             libroDAO.actualizarLibro(libroActual);
         }
 
-        // Actualizar la tabla después de guardar
+        // Refrescar la tabla de la ventana principal para que el libro dado de baja desaparezca si baja=1
         if (bibliotecaController != null) {
             bibliotecaController.actualizarTablaActual();
         }
@@ -120,18 +121,18 @@ public class LibroController {
 
     /**
      * Abre un selector de archivos para elegir una imagen de portada.
-     * La imagen seleccionada se muestra en el campo `ImageView` y se guarda en la variable `portada`.
+     * La imagen seleccionada se muestra en el campo ImageView y se guarda en la variable portada.
      */
     @FXML
     private void selectPortada() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter((LanguageManager.getProperty("imagenes")), "*.png", "*.jpg", "*.jpeg"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                LanguageManager.getProperty("imagenes"), "*.png", "*.jpg", "*.jpeg"));
+
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
             try {
                 portada = Files.readAllBytes(file.toPath());
-
-                // Mostrar la imagen en el ImageView
                 imgPortada.setImage(new Image(file.toURI().toString()));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -140,7 +141,7 @@ public class LibroController {
     }
 
     /**
-     * Elimina la portada del libro, borrando la imagen y restableciendo el campo `ImageView`.
+     * Elimina la portada del libro, borrando la imagen y restableciendo el campo ImageView.
      */
     @FXML
     private void removePortada() {
@@ -157,7 +158,7 @@ public class LibroController {
     }
 
     /**
-     * Cancela la operación y cierra la ventana sin guardar los cambios.
+     * Cancela la operacion y cierra la ventana sin guardar los cambios.
      */
     @FXML
     private void cancelar() {

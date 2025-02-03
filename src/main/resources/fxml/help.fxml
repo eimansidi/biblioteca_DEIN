@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.eiman.biblioteca.controllers.HelpController">
-    <children>
-        <WebView fx:id="webViewHelp" layoutX="10" layoutY="10" prefWidth="1000" prefHeight="800"/>
-    </children>
-</AnchorPane>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.eiman.biblioteca.controllers.HelpController">
+    <WebView fx:id="webView" prefWidth="850" prefHeight="750"/>
+</VBox>

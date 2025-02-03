@@ -4,12 +4,15 @@ import java.io.*;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Clase que gestiona la configuracion de idioma de la aplicacion.
- * Permite cargar, obtener, actualizar y guardar el idioma de la aplicacion desde un archivo de configuracion.
+ * Clase que gestiona la configuración de idioma de la aplicación.
+ * Permite cargar, obtener, actualizar y guardar el idioma de la aplicación desde un archivo de configuración.
  */
 public class LanguageManager {
+    private static final Logger logger = Logger.getLogger(LanguageManager.class.getName());
     private static final String CONFIG_FILE = "/config.properties";
     private static Properties properties = new Properties();
     private static Locale currentLocale;
@@ -20,30 +23,32 @@ public class LanguageManager {
     }
 
     /**
-     * Carga el idioma de la aplicacion desde el archivo de configuracion.
-     * Si no se encuentra la configuracion, establece el idioma por defecto ("es").
+     * Carga el idioma de la aplicación desde el archivo de configuración.
+     * Si no se encuentra la configuración, establece el idioma por defecto ("es").
      */
     private static void cargarIdioma() {
         try (InputStream input = LanguageManager.class.getResourceAsStream(CONFIG_FILE)) {
             if (input != null) {
                 properties.load(input);
+                logger.info("Idioma cargado desde el archivo de configuración: " + properties.getProperty("language"));
             } else {
-                throw new IOException("Archivo de configuracion no encontrado");
+                throw new IOException("Archivo de configuración no encontrado");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al cargar el archivo de configuración. Se usará el idioma por defecto (es).", e);
             properties.setProperty("language", "es");
         }
         actualizarLocale();
     }
 
     /**
-     * Actualiza el locale y el ResourceBundle en base al idioma cargado desde la configuracion.
+     * Actualiza el locale y el ResourceBundle en base al idioma cargado desde la configuración.
      */
     private static void actualizarLocale() {
         String lang = properties.getProperty("language", "es");
         currentLocale = lang.equals("es") ? new Locale("es", "ES") : new Locale("en", "US");
         messages = ResourceBundle.getBundle("i18n.messages", currentLocale);
+        logger.info("Locale actualizado a: " + currentLocale);
     }
 
     /**
@@ -58,7 +63,7 @@ public class LanguageManager {
     }
 
     /**
-     * Obtiene el locale actual.
+     * Obtiene el locale actual de la aplicación.
      *
      * @return El locale actual.
      */
@@ -67,24 +72,28 @@ public class LanguageManager {
     }
 
     /**
-     * Establece el idioma de la aplicacion y actualiza el locale.
+     * Establece el idioma de la aplicación y actualiza el locale.
      *
-     * @param lang El codigo del idioma a establecer ("es" o "en").
+     * @param lang El código del idioma a establecer ("es" o "en").
      */
     public static void setLanguage(String lang) {
+        logger.info("Cambiando el idioma a: " + lang);
         properties.setProperty("language", lang);
         actualizarLocale();
         guardarIdioma();
     }
 
     /**
-     * Guarda la configuracion del idioma en el archivo de configuracion.
+     * Guarda la configuración del idioma en el archivo de configuración.
+     * En caso de error, se registrará el problema.
      */
     private static void guardarIdioma() {
+        logger.info("Guardando la configuración de idioma en el archivo.");
         try (OutputStream output = new FileOutputStream("config.properties")) {
-            properties.store(output, null);
+            properties.store(output, "Configuración de idioma actualizada");
+            logger.info("Idioma guardado en archivo de configuración: " + properties.getProperty("language"));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error al guardar el idioma en el archivo de configuración.", e);
         }
     }
 }

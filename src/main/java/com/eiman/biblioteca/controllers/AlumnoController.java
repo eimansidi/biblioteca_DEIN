@@ -9,12 +9,17 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Controlador para la gestión de los alumnos.
  * Este controlador maneja la interfaz de usuario relacionada con la adición y modificación de datos de alumnos.
  * Permite insertar nuevos alumnos o actualizar los existentes.
  */
 public class AlumnoController {
+    private static final Logger logger = Logger.getLogger(AlumnoController.class.getName());
+
     @FXML private TextField txtDni, txtNombre, txtApellido1, txtApellido2;
     @FXML private Button btnGuardar, btnCancelar;
 
@@ -29,14 +34,18 @@ public class AlumnoController {
      */
     @FXML
     private void initialize() {
-        // Asignar tooltips manualmente desde el archivo de idioma
-        txtDni.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.dni")));
-        txtNombre.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.nombre")));
-        txtApellido1.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.apellido1")));
-        txtApellido2.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.apellido2")));
+        logger.info("Inicializando tooltips en AlumnoController");
+        try {
+            txtDni.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.dni")));
+            txtNombre.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.nombre")));
+            txtApellido1.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.apellido1")));
+            txtApellido2.setTooltip(new Tooltip(LanguageManager.getProperty("introduce.apellido2")));
 
-        btnGuardar.setTooltip(new Tooltip(LanguageManager.getProperty("guardar")));
-        btnCancelar.setTooltip(new Tooltip(LanguageManager.getProperty("cancelar")));
+            btnGuardar.setTooltip(new Tooltip(LanguageManager.getProperty("guardar")));
+            btnCancelar.setTooltip(new Tooltip(LanguageManager.getProperty("cancelar")));
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al inicializar los tooltips en AlumnoController", e);
+        }
     }
 
     /**
@@ -45,6 +54,7 @@ public class AlumnoController {
      * @param alumno El alumno a cargar.
      */
     public void setAlumno(Alumno alumno) {
+        logger.info("Cargando datos del alumno en el formulario");
         this.alumnoActual = alumno;
         if (alumno != null) {
             txtDni.setText(alumno.getDni());
@@ -62,22 +72,29 @@ public class AlumnoController {
      */
     @FXML
     private void guardarAlumno() {
-        if (alumnoActual == null) {
-            alumnoActual = new Alumno(txtDni.getText(), txtNombre.getText(), txtApellido1.getText(), txtApellido2.getText());
-            alumnoDAO.insertarAlumno(alumnoActual);
-        } else {
-            alumnoActual.setNombre(txtNombre.getText());
-            alumnoActual.setApellido1(txtApellido1.getText());
-            alumnoActual.setApellido2(txtApellido2.getText());
-            alumnoDAO.actualizarAlumno(alumnoActual);
-        }
+        try {
+            if (alumnoActual == null) {
+                alumnoActual = new Alumno(txtDni.getText(), txtNombre.getText(), txtApellido1.getText(), txtApellido2.getText());
+                logger.info("Insertando nuevo alumno: " + alumnoActual);
+                alumnoDAO.insertarAlumno(alumnoActual);
+            } else {
+                alumnoActual.setNombre(txtNombre.getText());
+                alumnoActual.setApellido1(txtApellido1.getText());
+                alumnoActual.setApellido2(txtApellido2.getText());
+                logger.info("Actualizando alumno existente: " + alumnoActual);
+                alumnoDAO.actualizarAlumno(alumnoActual);
+            }
 
-        // Actualizar la tabla después de guardar
-        if (bibliotecaController != null) {
-            bibliotecaController.actualizarTablaActual();
-        }
+            // Actualizar la tabla después de guardar
+            if (bibliotecaController != null) {
+                bibliotecaController.actualizarTablaActual();
+                logger.info("Tabla de alumnos actualizada en BibliotecaController");
+            }
 
-        cerrarVentana();
+            cerrarVentana();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al guardar los datos del alumno", e);
+        }
     }
 
     /**
@@ -85,6 +102,7 @@ public class AlumnoController {
      * @param bibliotecaController El controlador principal de la ventana.
      */
     public void setBibliotecaController(BibliotecaController bibliotecaController) {
+        logger.info("Estableciendo referencia a BibliotecaController");
         this.bibliotecaController = bibliotecaController;
     }
 
@@ -93,6 +111,7 @@ public class AlumnoController {
      */
     @FXML
     private void cancelar() {
+        logger.info("Operación cancelada por el usuario");
         cerrarVentana();
     }
 
@@ -100,6 +119,7 @@ public class AlumnoController {
      * Cierra la ventana actual.
      */
     private void cerrarVentana() {
+        logger.info("Cerrando ventana del formulario de Alumno");
         Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
     }
